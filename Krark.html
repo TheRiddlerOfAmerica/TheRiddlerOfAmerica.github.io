@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Krark Yulating Sakashima aka KYS</title>
+    <style>
+        .centerfold {
+            height: 1500px;
+            padding: 0;
+            margin: 0;
+            background-color: blue;
+            background-image: url("https://static.vecteezy.com/system/resources/previews/016/595/006/original/falling-coins-seamless-pattern-background-vector.jpg"),url("https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/5/5d/Cave.jpg/revision/latest?cb=20231025075222"),linear-gradient(red, blue);
+            background-repeat: repeat,no-repeat,no-repeat;
+            background-size: 150px,0px,auto;
+            background-blend-mode: luminosity,normal,normal;
+            /*Phone size 390×844*/
+        }
+        .results {
+            margin: auto;
+            padding: 2%;
+            width: 90%;
+            height: 500px;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        .manabar {
+            margin: auto;
+            padding: 0px;
+            width: 90%;
+            height: 80px;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+        }
+        .manaspot {
+            float: left;
+            width: 50%;
+            height: 100%;
+        }
+        .blocky {
+            float: left;
+            width: 20%;
+            height: 100%;
+            text-align: center;
+            font-size: 80px;
+            line-height: 80px;
+        }
+        img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 80px;
+            border-radius: 50%;
+            height: 80px;
+        }
+        .redmanapresser {
+            background-color: red;
+            border: 5px solid black;
+            width: 100%;
+            height: 100%;
+            color: white;
+            font-size: 50px;
+            vertical-align: top;
+            text-align: center;
+            line-height: 25px;
+        }
+        .bluemanapresser {
+            background-color: blue;
+            border: 5px solid black;
+            width: 100%;
+            height: 100%;
+            color: white;
+            font-size: 50px;
+            vertical-align: top;
+            text-align: center;
+            line-height: 25px;
+        }
+        .krarkstormthumb {
+            margin: auto;
+            padding: 0px;
+            width: 100%;
+            height: 500px;
+        }
+        .columnal {
+            padding:0px;
+            float: left;
+            width: 33.33%;
+            height: 100%;
+        }
+        .centerit {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .krarkplate {
+            width: 95%;
+            height: 40%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+        }
+        .stormplate {
+            width: 75%;
+            height: 30%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+        }
+        .upper {
+            width: 85%;
+            height: 25%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            font-size: 500%;
+            text-align: center;
+            line-height: 100%;
+        }
+        .downer {
+            width: 85%;
+            height: 25%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            font-size: 500%;
+            text-align: center;
+            line-height: 100%;
+        }
+        .upper2 {
+            width: 55%;
+            height: 25%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            font-size: 500%;
+            text-align: center;
+            line-height: 100%;
+        }
+        .downer2 {
+            width: 55%;
+            height: 25%;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            font-size: 500%;
+            text-align: center;
+            line-height: 100%;
+        }
+        .sendit {
+            width: 250px;
+            height: 250px;
+            background: rgb(255, 0, 0);
+            border: 5px solid black;
+            font-size: 400%;
+            text-align: center;
+            font-weight: 900;
+            line-height: 100%;
+            border-radius: 50%;
+            text-shadow: 0 3px 1px rgba(122,17,8,.8);
+            box-shadow: 0 22px 0 rgb(183,9,0), 0 15px 20px rgba(0,0,0,.35);
+        }
+        .pressed {
+            padding-top: 3px;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 rgb(183,0,0), 0 8px 6px rgba(0,0,0,.45);
+        }
+        .undercircle {
+            width: 100%;
+            height: 200px;
+            background: rgba(255,255,255,0.8);
+            border: 5px solid black;
+            border-bottom: 0px solid red;
+            border-radius: 200px 200px 0px 0px;
+        }
+        .casttriggers {
+            z-index: -1;
+            position: relative;
+            margin: auto;
+            width: 90%;
+            height: 700px;
+            background: rgba(255,255,255,0.8);
+            border-bottom: 5px solid black;
+        }
+        .casttriggers::before,
+        .casttriggers::after {
+            position: absolute;
+            width: 31%;
+            height: 100%;
+            content: "";
+        }
+
+        .casttriggers::before {
+            left: 0;
+            top: 0;
+            border-left: 5px solid black;
+            border-top: 5px solid black;
+        }
+
+        .casttriggers::after {
+            right: 0;
+            bottom: 0;
+            border-top:5px solid black;
+            border-right: 5px solid black;
+        }
+    </style>
+</head>
+<body class="centerfold">
+    <br/>
+    <div class="results" id="result_box"></div>
+    <br/>
+    <div class="manabar">
+        <div class="manaspot" style="background: rgba(249,172,144,0.8); ">
+            <div class="blocky">
+                <button class="redmanapresser">-</button>
+            </div>
+            <div class="blocky">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-OWlSsGURCX-vd8fNgnKemLWEngxgfP3ag&s" />
+            </div>
+            <div class="blocky" id="redmana">0</div>
+            <div class="blocky">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-OWlSsGURCX-vd8fNgnKemLWEngxgfP3ag&s" />
+            </div>
+            <div class="blocky">
+                <button class="redmanapresser">+</button>
+            </div>
+        </div>
+        <div class="manaspot" style="background: rgba(171,225,250,0.8); ">
+            <div class="blocky">
+                <button class="bluemanapresser">-</button>
+            </div>
+            <div class="blocky">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/MTG_%28U%29.svg/768px-MTG_%28U%29.svg.png?20180803212522" />
+            </div>
+            <div class="blocky" id="bluemana">0</div>
+            <div class="blocky">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/MTG_%28U%29.svg/768px-MTG_%28U%29.svg.png?20180803212522" />
+            </div>
+            <div class="blocky">
+                <button class="bluemanapresser">+</button>
+            </div>
+        </div>
+
+    </div>
+    <br/>
+    <div class="krarkstormthumb">
+        <div class="columnal">
+            <div class="centerit">
+                <button class="upper">+</button>
+            </div>
+            <div class="centerit">
+                <div class="krarkplate">
+                    <p style="font-size:300%; text-align: center; margin:2%">Krark Count</p>
+                    <p style="font-size:500%; text-align: center; margin:2%" id="krarkcount">0</p>
+                </div>
+            </div>
+            <div class="centerit">
+                <button class="downer">-</button>
+            </div>
+        </div>
+        <div class="columnal">
+            <div class="centerit">
+                <button class="upper2">+</button>
+            </div>
+            <div class="centerit">
+                <div class="stormplate">
+                    <p style="font-size:250%; text-align: center; margin:2%">Storm</p>
+                    <p style="font-size:400%; text-align: center; margin:2%" id="stormcount">0</p>
+                </div>
+            </div>
+            <div class="centerit">
+                <button class="downer2">-</button>
+            </div>
+            <br />
+            <br />
+            <div class="centerit">
+                <div class="undercircle">
+                    <br />
+                    <br />
+                    <div class="centerit">
+                        <button class="sendit">CAST!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="columnal">
+            <div class="centerit">
+                <button class="upper">+</button>
+            </div>
+            <div class="centerit">
+                <div class="krarkplate">
+                    <p style="font-size:300%; text-align: center; margin:2%">Thumb Count</p>
+                    <p style="font-size:500%; text-align: center; margin:2%" id="thumbcount">0</p>
+                </div>
+            </div>
+            <div class="centerit">
+                <button class="downer">-</button>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <div class="casttriggers">
+
+    </div>
+</body>
+</html>
