@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>IdleBreak</title>
+        <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+        <style type="text/css">
+            .game {
+                margin: auto;
+                width: 80%;
+                border: 0px solid green;
+                padding: 10px;
+            }
+            body {
+                background-color: #000000;
+                background-image: url("bright-squares.png");
+                /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+            }
+        </style>
+    </head>
+
+
+
+    <body>
+        <div class="game" id="gameholder"></div>
+        <script type="text/javascript">
+            //I need a method for loading save data from the website itself...
+            var save = JSON.parse(localStorage.getItem("saveData"));
+            if (save == null) {
+                localStorage.setItem("saveData", JSON.stringify({ Money: 0, Stat: 0 }));
+                save = JSON.parse(localStorage.getItem("saveData"));
+                console.log(save);
+            }
+            //So this object created above will need to store all of the save data created. This includes triggers, currency, and
+            //Other stuff... Yeah. The above system works, but until I have the game finalized, I'm not going to edit this for the
+            //save file. Instead I will have this object below that I will add to and tweak until it's ready.
+            save = {
+                Money: 0,//Basic currency
+                Triggers: {
+                    Introduction: true, //Trigger the intro for someone first opening the game
+                    Tutorial: true, //Trigger the tutorial if this is true
+                },
+                BouncerShop: { //This holds onto what bouncers are unlocked in the shop.
+                    Basic: true, //Basic block that the ball can bounce off of.
+                    Money: false, //Basic block that earns money when bounced off of.
+                    Horizontal_Speed: false, //Increases the horizontal speed of the ball when bounced on.
+                    Vertical_Speed: false, //Increases the vertical speed of the ball when bounced on.
+                    Horizontal_Wide: false, //A wide horizontal block, bigger than normal.
+                    Vertical_Wide: false, //A wide vertical block, bigger than normal.
+                    Unstable: false //The more it is hit by smaller blocks, the more it will speed up the main block.
+                },
+                BouncerMult: { //This holds onto the cost multipliers that increase costs in the shop.
+                    Basic: 2, //Basic block that the ball can bounce off of.
+                    Money: 5, //Basic block that earns money when bounced off of.
+                    Horizontal_Speed: 4, //Increases the horizontal speed of the ball when bounced on.
+                    Vertical_Speed: 4, //Increases the vertical speed of the ball when bounced on.
+                    Horizontal_Wide: 10, //A wide horizontal block, bigger than normal.
+                    Vertical_Wide: 10, //A wide vertical block, bigger than normal.
+                    Unstable: 100 //The more it is hit by smaller blocks, the more it will speed up the main block.
+                },
+                ShardShop: {
+                    Mass_Upgrades: 0, //How many mass upgrades have been purchased
+                    Velocity_Gain: 0, //How many velocity gain upgrades have been purchased
+                    Packing_Reduction: 0, //Packing is how much space is blocked off when you buy a bouncer. lowers it.
+                    Money_Mult: 0, //This upgrade just multiplies the amount of money gained from money blocks
+                    Velocity_Keep: 0 //This upgrade maintains speed between crashes thorugh worlds
+                },
+                ShardMult: { //This is the speed at which the cost will increase.
+                    Mass_Upgrades: 2, //How many mass upgrades have been purchased
+                    Velocity_Gain: 4, //How many velocity gain upgrades have been purchased
+                    Packing_Reduction: 10, //Packing is how much space is blocked off when you buy a bouncer. lowers it.
+                    Money_Mult: 2, //This upgrade just multiplies the amount of money gained from money blocks
+                    Velocity_Keep: 2 //This upgrade maintains speed between crashes thorugh worlds
+                },
+                Buffer: 100,//How much extra space is put around bouncers
+                X: 500,//Save the X position of the player block
+                Y: 300,//Save the Y position of the player block
+                bouncers: [],//A list of the bouncer objects on screen, the game can use this to add them back in on load
+                shards: 0 //The advanced currency
+            }
+
+            console.log(save);
+
+            //Objects
+
+            //This handles the cutscenes and tutorials, just load up the text box information in the steps and each click will
+            //move the steps forward. Ideally in the end game users can re-run the tutorials. Not the end game of the game, but
+            //the end game of this game development.
+            class cutscene {
+                constructor(config){
+                    this.steps = config.steps;
+                    this.start = 0;
+                }
+                next() {
+                    this.start += 1;
+                    if (this.steps.length > this.start) {
+                        //update the screen with the new dialogue
+                    }
+                }
+            }
+
+            class Breaker extends Phaser.GameObjects.Sprite {
+                constructor(config){
+                    super(config.scene, config.x, config.y, "square");
+                    this.displayWidth = 20;
+                    this.displayHeight = 20;
+                    this.setTint(0x00ffff);
+                    this.speed = 100;
+                    this.vector = [1, 1];
+                    this.normal = [0, 0];
+                    this.breaker = false;
+                    this.normalize();
+                    config.scene.physics.add.existing(this);
+                    config.scene.add.existing(this);
+
+                    this.mass = 1;
+                    this.velocity_gain = 1;
+                }
+                normalize() {
+                    let temp = Math.sqrt((this.vector[0] ** 2) + (this.vector[1] ** 2));
+                    this.normal = [this.vector[0] / temp, this.vector[1] / temp];
+                    //Ideally we will have a check in here that will make sure the vector doesn't get to the point where
+                    //the direction goes like straight up and down.
+                }
+                speedup() {
+                    this.speed += this.velocity_gain / this.mass;
+                    console.log(this.speed);
+                    //console.log(this.body.velocity);
+                    this.vector = [this.body.velocity.x, this.body.velocity.y];
+                    this.normalize();
+                    //console.log(this.normal);
+                    this.body.setVelocity(this.normal[0] * this.speed, this.normal[1] * this.speed);
+                    this.scene.background = Math.floor(this.speed / 100);
+                    if (this.speed > 25000) {
+                        this.breaker = true;
+                    }
+                }
+            }
+
+            class Bouncer extends Phaser.GameObjects.Sprite {
+                constructor(config) {
+                    //A bouncer is made of 3 parts,
+                    //The label that denotes what kind it is.
+                    //The buffer, which denotes how close it can be to another game object
+                    //The bouncer itself, which can be interacted with by balls and the breaker.
+                    /*
+                    config should look like:
+                    config = {
+                        scene: this,
+                        x: 100,
+                        y: 100,
+                        width: 100,
+                        height: 100,
+                        bufferx: 200,
+                        buffery: 200,
+                        textx: 80,
+                        texty: 80,
+                        word: '◘',
+                        tint: 0xabab00;                        
+                    }
+                    */
+                    super(config.scene, config.x, config.y, "square");
+                    this.scene = config.scene;
+                    this.label = this.scene.add.text(config.x - (config.width / 4), config.y - (config.height / 4), config.word, { font: config.height / 2 + 'px Arial' });
+                    this.buffer = config.scene.add.sprite(config.x, config.y, "square");
+                    this.buffer.displayWidth = config.bufferx;
+                    this.buffer.displayHeight = config.buffery;
+                    this.bufferx = config.bufferx;
+                    this.buffery = config.buffery;
+                    this.buffer.alpha = 0.2;
+                    this.buffer.depth = -3;
+                    this.depth = -2;
+                    this.label.depth = -1;
+                    this.buffer.setTint(0xaa0000);
+                    this.displayWidth = config.width;
+                    this.displayHeight = config.height;
+                    this.textxoffset = config.width / 4;
+                    this.textyoffset = config.height / 4;
+                    this.setTint(config.tint);
+                    config.scene.physics.add.existing(this);
+                    config.scene.add.existing(this);
+                }
+
+                //This function keeps the bouncer on the mouse when placing a new bouncer on screen.
+                track() {
+                    if (this.scene.mousePos[0] > 1000-(0.5 * this.bufferx)) {
+                        this.scene.mousePos[0] = 1000- (0.5 * this.bufferx);
+                    }
+                    if (this.scene.mousePos[0] < (0.5 * this.bufferx)) {
+                        this.scene.mousePos[0] = (0.5 * this.bufferx);
+                    }
+                    if (this.scene.mousePos[1] > 600-(0.5 * this.buffery)) {
+                        this.scene.mousePos[1] = 600-(0.5 * this.buffery);
+                    }
+                    if (this.scene.mousePos[1] < (0.5 * this.buffery)) {
+                        this.scene.mousePos[1] = (0.5 * this.buffery);
+                    }
+                    this.x = this.scene.mousePos[0];
+                    this.y = this.scene.mousePos[1];
+                    this.buffer.x = this.scene.mousePos[0];
+                    this.buffer.y = this.scene.mousePos[1];
+                    this.label.x = this.scene.mousePos[0]-this.textxoffset;
+                    this.label.y = this.scene.mousePos[1]-this.textyoffset;
+                }
+                //This is what it does when it bounces.
+                onBounce() {
+                    //Do Nothing Right Now
+                    //console.log("Boing");
+                }
+            }
+
+            class Ball extends Phaser.GameObjects.Sprite {
+
+            }
+
+            class Button extends Phaser.GameObjects.Sprite {
+                constructor(config) {
+                    super(config.scene, config.x, config.y, "square");
+                    this.displayWidth = config.width;
+                    this.displayHeight = config.height;
+                    this.setTint(0xaaaaaa);
+                    this.onClick = config.onClick;
+                    config.scene.add.existing(this);
+                    this.label = this.scene.add.text(config.x-(config.width/4), config.y-(config.height/4), config.word, { font: config.height/2+'px Arial' });
+                }
+            }
+
+
+
+
+
+
+
+        var config = {
+            type: Phaser.AUTO,
+            width: 1000,
+            height: 600,
+            parent: "gameholder",
+            disableContextMenu: true,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: true
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        function preload() {
+            //The square by which all other assets are made of.
+            this.load.image('square','https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Solid_white_bordered.svg/2048px-Solid_white_bordered.svg.png')
+
+            //Holds all of the functions that can occur when you click the button.
+            this.buttonActions = {
+                Null: function () {
+                    //Do Nothing
+                },
+                MainShop: function () {
+                    this.scene.openShop();
+                }
+            };
+
+            //This holds all of the data for the buttons of the shop.
+            this.ShopConfig = {
+                Shop: { scene: this, x: 75, y: 50, width: 100, height: 50, onClick: this.buttonActions.MainShop, word: "Shop" },
+                ShopBG: { scene: this, x: 500, y: 300, width: 1000, height: 600, onClick: this.buttonActions.Null, word: "" }
+            };
+
+            //We use this to handle the changing background on screen.
+            this.background = 0;
+
+            this.bufferconfigdeletelater ={
+                scene: this,
+                x: 100,
+                y: 100,
+                width: 40,
+                height: 40,
+                bufferx: 140,
+                buffery: 140,
+                word: '◘',
+                tint: 0xabab00
+            }
+
+            //Used to track the mouse position on screen.
+            this.mousePos = [0, 0];
+        }
+
+        function create() {
+
+            //Here are the groups I want to have.
+            this.bgroup = this.add.group(); //B group for bouncer group
+            this.pgroup = this.add.group(); //P group for projectile group
+            
+            //This function is used to load up the save file information.
+            this.loadSave = function () {
+                this.testerPrime = new Breaker({ scene: this, x: save.X, y: save.Y });
+                //Need a bit of extra stuff for this one aside from the usual enable physics.
+                this.testerPrime.body.onWorldBounds = true;
+                this.enablePhys(this.testerPrime);
+                //Handles when the testerPrime body hits the world bound and speeds up. Eventually will also handle breaks.
+                this.physics.world.on('worldbounds', this.middleMan);
+                this.money = save.Money;
+                this.shards = save.Shards;
+                for (let i = 0; i < save.bouncers.length; i++) {
+                    //This in the future will generate the bouncers that were on the field when the game was saved.
+                }
+                this.physics.add.collider(this.testerPrime, this.bgroup, (tester, bouncer) => {
+                    tester.speedup();
+                    bouncer.onBounce();
+                });
+                //Next up we need to load up all the buttons and their interactions.
+                //I want the buttons to be transparent until someone hovers over them.
+                //We need a button for the shop first, then we need to implement all the interactions of opening the shop... oof.
+                this.Shop = new Button(this.ShopConfig.Shop).setInteractive();
+
+            }
+
+            //This activates a buttons OnClick function
+            this.input.on('gameobjectdown', (pointer, gameObject) => {
+                // console.log(gameObject.name, gameObject.x, gameObject.y);
+                gameObject.onClick();
+
+            });
+            this.input.on('gameobjectout', (pointer, gameObject) => {
+                gameObject.alpha = 0.1;
+                gameObject.label.alpha = 0.2;
+            });
+            this.input.on('gameobjectover', (pointer, gameObject) => {
+                gameObject.alpha = 1;
+                gameObject.label.alpha = 1;
+            });
+            this.input.on('pointerdown', function (pointer) {
+                if (pointer.rightButtonDown()) {
+                    this.backout();
+                }
+                if (this.placing) {
+                    this.tryPlace();
+                }
+            }, this);
+            this.input.on('pointermove', (pointer) => {
+                //Update Mouse Position
+                this.mousePos = [pointer.x, pointer.y];
+            });
+
+            //This is all about opening the shop which will be partially transparent while the game continues behind the screen.
+            this.openShop = function () {
+                this.shopping = true;
+                //Create overlay
+                this.BG = new Button(this.ShopConfig.ShopBG);
+                this.BG.alpha = 0.3;
+                //hide the shop button
+                this.Shop.visible = false;
+                this.Shop.label.visible = false;
+
+                //Here come the large if statement tree that will display the bouncers based on if they are unlocked.
+                if (save.BouncerShop.Basic) {
+                    //Generate the bouncer using the new bouncer command
+                    this.shop1 = new Bouncer(this.bufferconfigdeletelater);
+                    this.shop1.onClick = function () {
+                        this.scene.openPlacer("basic");
+                    }
+                    this.shop1.setInteractive();
+                }
+            }
+
+            this.openPlacer = function (choice) {
+                this.backout();
+                if (choice == "basic") {
+                    this.held = new Bouncer(this.bufferconfigdeletelater);
+                    this.placing = true;
+                }
+                this.Shop.visible = false;
+                this.Shop.label.visible = false;
+            }
+
+            this.tryPlace = function () {
+                //This function is all about trying to place a bouncer down, it's just gotta check collision with all the other bouncers.
+                let currentBouncers = this.bgroup.getChildren();
+                var boundsA = this.held.buffer.getBounds();
+                var place = true;
+                console.log(currentBouncers);
+                for (let i = 0; i < currentBouncers.length; i++) {
+                    var boundsB = currentBouncers[i].buffer.getBounds();
+                    //This checks if the two bouncers buffers are overlapping
+                    if (Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)) {
+                        place = false
+                    }
+                }
+                var boundsB = this.testerPrime.getBounds();
+                //This checks if the two bouncers buffers are overlapping
+                if (Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)) {
+                    place = false
+                }
+                //If this is true it means we can place the object.
+                if (place) {
+                    this.held.body.immovable = true;
+                    this.bgroup.add(this.held);
+                    this.placing = false;
+                    this.Shop.visible = true;
+                    this.Shop.label.visible = true;
+                }
+            }
+
+            //This is all about closing the shop or backing out of the placement menu.
+            this.backout = function(){
+                if (this.placing) {
+                    //This code will execute when placing a bouncer.
+                    this.placing = false;
+                    this.held.destroy();
+                    this.held.label.destroy();
+                    this.held.buffer.destroy();
+                    this.Shop.visible = true;
+                    this.Shop.label.visible = true;
+
+                }else if (this.shopping) {
+                    //This code will execute when in the shop, in order to back out of the shop.
+                    this.shopping = false;
+                    this.BG.destroy();
+                    this.Shop.visible = true;
+                    this.Shop.label.visible = true;
+                    //This is the same big tree as opening the shop, just for closing everything.
+                    if (save.BouncerShop.Basic) {
+                        this.shop1.label.destroy();
+                        this.shop1.buffer.destroy();
+                        this.shop1.destroy();
+                    }
+                }
+            }
+
+
+            this.middleMan = function () {
+                //You must use this.scene.??? to actually pull the item, as this listenener encapsulates the game.
+                //console.log(this.scene.testerPrime);
+                this.scene.testerPrime.speedup();
+            }
+
+            //This funciton enables the physics for any boxes we add, just an easy way to do it instead of copy pasta.
+            this.enablePhys = function (obj) {
+                obj.body.setVelocity(obj.normal[0] * obj.speed, obj.normal[1] * obj.speed);
+                obj.body.setCollideWorldBounds(true, 1, 1);
+                obj.body.setBounce(1);
+            }
+            
+
+            this.numToHex = function(num){
+                //This assumes the number is less than 255
+                let hex = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+                let fin = '';
+                fin = fin + hex[Math.floor(num / 16)];
+                fin = fin + hex[num % 16];
+                return fin;
+            }
+
+            //Once all the functions are up and running, you load up the save.
+            this.loadSave();
+
+            
+
+
+
+
+
+
+
+
+        }
+
+        function update() {
+            //This if keeps it from running and changing the background html every frame of the game.
+            //Only changes when we have updated it in the game.
+            if (this.lastcolor != this.background) {
+                this.lastcolor = this.background;
+                //This line of code increases the red color of the background to add some cool stuff for the game.
+                document.body.style.backgroundColor = '#' + this.numToHex(this.background) + '0000';
+            }
+            if (this.placing) {
+                this.held.track();
+            }
+        }
+
+        </script>
+
+    </body>
+</html>
