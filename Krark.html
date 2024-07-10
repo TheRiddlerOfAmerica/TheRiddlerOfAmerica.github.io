@@ -6,15 +6,15 @@
     <title>Krark Yulating Sakashima aka KYS</title>
     <style>
         .centerfold {
-            height: 1500px;
+            height: 100%;
             padding: 0;
             margin: 0;
             background-color: blue;
-            background-image: url("https://static.vecteezy.com/system/resources/previews/016/595/006/original/falling-coins-seamless-pattern-background-vector.jpg"),url("https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/5/5d/Cave.jpg/revision/latest?cb=20231025075222"),linear-gradient(red, blue);
-            background-repeat: repeat,no-repeat,no-repeat;
-            background-size: 150px,0px,auto;
-            background-blend-mode: luminosity,normal,normal;
-            /*Phone size 390×844*/
+            background-image: url("falling-coins-seamless-pattern-background-vector.jpg"),linear-gradient(red, blue);
+            background-repeat: repeat,no-repeat;
+            background-size: 150px,auto;
+            background-blend-mode: luminosity,normal;
+            /*Phone size 390ï¿½844*/
         }
         .results {
             margin: auto;
@@ -25,6 +25,7 @@
             border: 5px solid black;
             overflow-y: scroll;
             overflow-x: hidden;
+            font-size: 30px;
         }
         .manabar {
             margin: auto;
@@ -40,6 +41,7 @@
             height: 100%;
         }
         .blocky {
+            position: relative;
             float: left;
             width: 20%;
             height: 100%;
@@ -89,6 +91,12 @@
             width: 33.33%;
             height: 100%;
         }
+        .columnal2 {
+            padding: 0px;
+            float: left;
+            width: 50%;
+            height: 50%;
+        }
         .centerit {
             display: flex;
             justify-content: center;
@@ -107,6 +115,7 @@
             border: 5px solid black;
         }
         .upper {
+            color: black;
             width: 85%;
             height: 25%;
             background: rgba(255,255,255,0.8);
@@ -116,6 +125,7 @@
             line-height: 100%;
         }
         .downer {
+            color: black;
             width: 85%;
             height: 25%;
             background: rgba(255,255,255,0.8);
@@ -125,6 +135,7 @@
             line-height: 100%;
         }
         .upper2 {
+            color: black;
             width: 55%;
             height: 25%;
             background: rgba(255,255,255,0.8);
@@ -134,6 +145,7 @@
             line-height: 100%;
         }
         .downer2 {
+            color: black;
             width: 55%;
             height: 25%;
             background: rgba(255,255,255,0.8);
@@ -143,6 +155,8 @@
             line-height: 100%;
         }
         .sendit {
+            z-index:1;
+            color: black;
             width: 250px;
             height: 250px;
             background: rgb(255, 0, 0);
@@ -169,7 +183,6 @@
             border-radius: 200px 200px 0px 0px;
         }
         .casttriggers {
-            z-index: -1;
             position: relative;
             margin: auto;
             width: 90%;
@@ -188,6 +201,7 @@
         .casttriggers::before {
             left: 0;
             top: 0;
+            z-index: -1;
             border-left: 5px solid black;
             border-top: 5px solid black;
         }
@@ -195,44 +209,235 @@
         .casttriggers::after {
             right: 0;
             bottom: 0;
-            border-top:5px solid black;
+            z-index: -1;
+            border-top: 5px solid black;
             border-right: 5px solid black;
+        }
+        .casttitle{
+            border-bottom: 5px solid black;
+            font-size:50px;
         }
     </style>
 </head>
-<body class="centerfold">
+<body class="centerfold" style="z-index: -2;" id="daboi">
+    <script>
+        var colorPoint = 0;
+        var invert = false;
+
+        setInterval(colorChanger, 25);
+
+        function colorChanger() {
+            colorPoint++;
+            //console.log(colorPoint);
+            if (colorPoint > 2550) {
+                colorPoint = 0;
+                invert = !invert;
+            }
+            let state = Math.floor(colorPoint / 10); //Should never go above 255;
+            if (invert) {
+                //console.log('linear-gradient(rgb(' + (255 - state) + ', 0, ' + (0 + state) + ') 0px, rgb(255, 0, 0) ' + colorPoint + 'px , rgb(' + (0 + state) + ', 0, ' + (255 - state) + ')) 1530px');
+                document.getElementById("daboi").style.backgroundImage = 'url("falling-coins-seamless-pattern-background-vector.jpg"),linear-gradient(rgb(' + (0 + state) + ', 0, ' + (255 - state) + ') 0px, rgb(0, 0, 255) ' + (colorPoint / 25.50) + '%, rgb(' + (255 - state) + ', 0, ' + (0 + state) + ') 100%)';
+                document.getElementById("daboi").style.backgroundColor = 'rgb(' + (255 - state) + ', 0, ' + (0 + state) + ')';
+
+            } else {
+                //console.log('linear-gradient(rgb(' + (255 - state) + ', 0, ' + (0 + state) + ') 0px, rgb(255, 0, 0) ' + colorPoint + 'px , rgb(' + (0 + state) + ', 0, ' + (255 - state) + ')) 1530px');
+                document.getElementById("daboi").style.backgroundImage = 'url("falling-coins-seamless-pattern-background-vector.jpg"),linear-gradient(rgb(' + (255 - state) + ', 0, ' + (0 + state) + ') 0px, rgb(255, 0, 0) ' + (colorPoint / 25.50) + '%, rgb(' + (0 + state) + ', 0, ' + (255 - state) + ') 100%)';
+                document.getElementById("daboi").style.backgroundColor = 'rgb(' + (0 + state) + ', 0, ' + (255 - state) + ')';
+            }
+        }
+    </script>
+    
+    
+    <script>
+        //Dear lord that was 400 lines of design, now for just as many lines of code.
+        function clickChange(spot,ud) {
+            document.getElementById(spot).innerHTML = parseInt(document.getElementById(spot).innerHTML) + ud;
+            //console.log("done");
+        }
+
+        function cast() {
+            //console.log("boom");
+            //collect the variables. ints only
+            var red = parseInt(document.getElementById("red").innerHTML);
+            var blue = parseInt(document.getElementById("blue").innerHTML);
+            var krark = parseInt(document.getElementById("krark").innerHTML);
+            var storm = parseInt(document.getElementById("storm").innerHTML);
+            var thumb = parseInt(document.getElementById("thumb").innerHTML);
+            var redin = parseInt(document.getElementById("redin").innerHTML);
+            var bluein = parseInt(document.getElementById("bluein").innerHTML);
+            var redout = parseInt(document.getElementById("redout").innerHTML);
+            var blueout = parseInt(document.getElementById("blueout").innerHTML);
+            //collect variables. boolean value only
+            var ral = document.getElementById("ral").checked;
+            /*
+            console.log(red);
+            console.log(blue);
+            console.log(krark);
+            console.log(storm);
+            console.log(thumb);
+            console.log(redin);
+            console.log(bluein);
+            console.log(redout);
+            console.log(blueout);
+            */
+            //console.log(ral);
+
+            document.getElementById("storm").innerHTML = storm + 1;
+
+            
+            
+
+            var concise = "Concise Summary: <br>";
+            var history = "";
+
+            var minSuccess = 0;
+            var maxSuccess = 0;
+            var toGraveyard = false;
+            var coinflips = 0;
+
+            //Time to flip some coins.
+            if (ral) {
+                let tempHist = "";
+                let success = false;
+                for (let i = 0; i < Math.pow(2, thumb); i++) {
+                    let y = Math.floor(Math.random() * 2);
+                    if (y == 1) {
+                        tempHist += "Heads - ";
+                        success = true;
+                    } else {
+                        tempHist += "Tails - ";
+                    }
+                    coinflips += 1;
+                }
+                if (success) {
+                    concise += "Heads, Ral can transform this cast <br>";
+                    history += "Ral Coin Flip(s) - " + tempHist + " <br>";
+                } else {
+                    concise += "Tails, Take 1 damage from Ral <br>";
+                    history += "Ral Coin Flip(s) - " + tempHist + " <br>";
+                }
+            }
+
+            for (let i = 0; i < krark; i++) {
+                let tempSuc = false;
+                let tempFail = false;
+                let tempHist = "";
+                history += "Krark Trigger " + (i + 1) + " : <br>";
+                for (let j = 0; j < Math.pow(2, thumb); j++) {
+                    if (Math.floor(Math.random() * 2) == 1) {
+                        tempHist += "Heads - ";
+                        tempSuc = true;
+                    } else {
+                        tempHist += "Tails - ";
+                        tempFail = true;
+                    }
+                    coinflips += 1;
+                }
+                if (tempSuc) {
+                    maxSuccess += 1;
+                    minSuccess += 1;
+                }
+                if (tempFail && minSuccess > 0) {
+                    minSuccess -= 1;
+                }
+                history += tempHist + "<br>";
+                
+            }
+
+            if (maxSuccess == minSuccess || !(thumb > 0)) {
+                concise += maxSuccess + " successes. <br>";
+            } else if (maxSuccess != minSuccess) {
+                concise += maxSuccess + " successes, however you may also take a minimum of " + minSuccess + " successes thanks to Krark's Thumb. <br>";
+            } else {
+                concise += maxSuccess + " successes, though even with Krark's Thumb, you have no choice of success amount. <br>";
+            }
+            if (maxSuccess == 0 && krark < 3) {
+                concise += "Krark has decided you get no casts. <br>";
+            } else if (maxSuccess == 0 && krark >= 3){
+                concise += "The council of Krark's has vetoed your cast.";
+            }
+            if (maxSuccess > 0 && krark < 3) {
+                concise += "Krark has permitted you to cast this spell.";
+            } else if (maxSuccess > 0 && krark >= 3){
+                concise += "The council of krarks has convened and approved your spell casting.";
+            }
+
+
+            document.getElementById("results").innerHTML = concise + "<br> <br> Coin Flip History: <br>" + history;
+
+            if (coinflips > 100) {
+                coinflips = 100;
+            }
+            var stop = 0;
+            var stopID = setInterval(sound, 25);
+            function sound() {
+                var snd = null;
+                let choice = Math.random() * 100;
+                if (choice < 0.1) {
+                    console.log(choice);
+                }
+                
+                if (choice > 80) {
+                    snd = new Audio("coin-hit.wav");
+                } else if (choice > 60) {
+                    snd = new Audio("coin-hit2.wav");
+                } else if (choice > 10) {
+                    snd = new Audio("cointhrow.mp3");
+                } else if (choice > 5) {
+                    snd = new Audio("coin-toss.mp3");
+                } else if (choice > 1 && coinflips > 50) {
+                    snd = new Audio("coinsondesk.mp3");
+                } else if (choice < 0.025) {
+                    snd = new Audio("cuoins_0000.mp3");
+                } else if (choice < 0.05) {
+                    snd = new Audio("toss-a-coin.mp3");
+                } else if (choice < 0.075) {
+                    snd = new Audio("iroh-the-last-airbender-the-coin-is-appreciated.mp3");
+                }
+
+                if (snd != null) {
+                    snd.play();
+                }
+                
+                stop++;
+                if (stop > coinflips) {
+                    clearInterval(stopID);
+                }
+            }
+
+
+        }
+    </script>
+
+
     <br/>
-    <div class="results" id="result_box"></div>
+    <div class="results" id="results"></div>
     <br/>
     <div class="manabar">
         <div class="manaspot" style="background: rgba(249,172,144,0.8); ">
             <div class="blocky">
-                <button class="redmanapresser">-</button>
+                <button class="redmanapresser" onclick="clickChange('red',-1)">-</button>
             </div>
             <div class="blocky">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-OWlSsGURCX-vd8fNgnKemLWEngxgfP3ag&s" />
             </div>
-            <div class="blocky" id="redmana">0</div>
+            <div class="blocky" id="red">0</div>
             <div class="blocky">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-OWlSsGURCX-vd8fNgnKemLWEngxgfP3ag&s" />
             </div>
             <div class="blocky">
-                <button class="redmanapresser">+</button>
+                <button class="redmanapresser" onclick="clickChange('red',1)">+</button>
             </div>
         </div>
         <div class="manaspot" style="background: rgba(171,225,250,0.8); ">
             <div class="blocky">
-                <button class="bluemanapresser">-</button>
+                <button class="bluemanapresser" onclick="clickChange('blue',-1)">-</button>
             </div>
             <div class="blocky">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/MTG_%28U%29.svg/768px-MTG_%28U%29.svg.png?20180803212522" />
             </div>
-            <div class="blocky" id="bluemana">0</div>
+            <div class="blocky" id="blue">0</div>
             <div class="blocky">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/MTG_%28U%29.svg/768px-MTG_%28U%29.svg.png?20180803212522" />
             </div>
             <div class="blocky">
-                <button class="bluemanapresser">+</button>
+                <button class="bluemanapresser" onclick="clickChange('blue',1)">+</button>
             </div>
         </div>
 
@@ -241,30 +446,30 @@
     <div class="krarkstormthumb">
         <div class="columnal">
             <div class="centerit">
-                <button class="upper">+</button>
+                <button class="upper" onclick="clickChange('krark',1)">+</button>
             </div>
             <div class="centerit">
                 <div class="krarkplate">
                     <p style="font-size:300%; text-align: center; margin:2%">Krark Count</p>
-                    <p style="font-size:500%; text-align: center; margin:2%" id="krarkcount">0</p>
+                    <p id="krark" style="font-size:500%; text-align: center; margin:2%">0</p>
                 </div>
             </div>
             <div class="centerit">
-                <button class="downer">-</button>
+                <button class="downer" onclick="clickChange('krark',-1)">-</button>
             </div>
         </div>
         <div class="columnal">
             <div class="centerit">
-                <button class="upper2">+</button>
+                <button class="upper2" onclick="clickChange('storm',1)">+</button>
             </div>
             <div class="centerit">
                 <div class="stormplate">
                     <p style="font-size:250%; text-align: center; margin:2%">Storm</p>
-                    <p style="font-size:400%; text-align: center; margin:2%" id="stormcount">0</p>
+                    <p style="font-size:400%; text-align: center; margin:2%" id="storm">0</p>
                 </div>
             </div>
             <div class="centerit">
-                <button class="downer2">-</button>
+                <button class="downer2" onclick="clickChange('storm',-1)">-</button>
             </div>
             <br />
             <br />
@@ -273,23 +478,23 @@
                     <br />
                     <br />
                     <div class="centerit">
-                        <button class="sendit">CAST!</button>
+                        <button class="sendit" onclick="cast()">CAST!</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="columnal">
             <div class="centerit">
-                <button class="upper">+</button>
+                <button class="upper" onclick="clickChange('thumb',1)">+</button>
             </div>
             <div class="centerit">
                 <div class="krarkplate">
                     <p style="font-size:300%; text-align: center; margin:2%">Thumb Count</p>
-                    <p style="font-size:500%; text-align: center; margin:2%" id="thumbcount">0</p>
+                    <p style="font-size:500%; text-align: center; margin:2%" id="thumb">0</p>
                 </div>
             </div>
             <div class="centerit">
-                <button class="downer">-</button>
+                <button class="downer" onclick="clickChange('thumb',-1)">-</button>
             </div>
         </div>
     </div>
@@ -297,7 +502,85 @@
     <br />
     <br />
     <div class="casttriggers">
+        <div class="columnal2">
+            <br />
+            <br />
+            <br />
+            <br />
+            <div class="centerit">
+                <div class="casttitle">
+                    Mana Spent
+                </div>
+            </div>
+            <div class="centerit">
 
+                <div class="manaspot" style="background: rgba(249,172,144,0.8); height: 15%; width:70%; ">
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="redmanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('redin',-1)">-</button>
+                    </div>
+                    <div class="blocky" style="width: 33.33%;" id="redin">0</div>
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="redmanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('redin',1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="centerit">
+
+                <div class="manaspot" style="background: rgba(171,225,250,0.8); height: 15%; width: 70%; ">
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="bluemanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('bluein',-1)">-</button>
+                    </div>
+                    <div class="blocky" style="width: 33.33%;" id="bluein">0</div>
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="bluemanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('bluein',1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="centerit">
+                <div class="casttitle">
+                    Ral MM Trigger
+                </div>
+            </div>
+            <div class="centerit">
+                <input type="checkbox" id="ral" name="ral" value="hello" style="height:100px; width:100px; z-index:1;">
+            </div>
+        </div>
+        <div class="columnal2">
+            <br />
+            <br />
+            <br />
+            <br />
+            <div class="centerit">
+                <div class="casttitle">
+                    Mana Gained
+                </div>
+            </div>
+            <div class="centerit">
+
+                <div class="manaspot" style="background: rgba(249,172,144,0.8); height: 15%; width:70%; ">
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="redmanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('redout',-1)">-</button>
+                    </div>
+                    <div class="blocky" style="width: 33.33%;" id="redout">0</div>
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="redmanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('redout',1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="centerit">
+
+                <div class="manaspot" style="background: rgba(171,225,250,0.8); height: 15%; width: 70%; ">
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="bluemanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('blueout',-1)">-</button>
+                    </div>
+                    <div class="blocky" style="width: 33.33%;" id="blueout">0</div>
+                    <div class="blocky" style="width: 33.33%;">
+                        <button class="bluemanapresser" style="height: 100%; line-height: 1.5em; z-index:66;" onclick="clickChange('blueout',1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
