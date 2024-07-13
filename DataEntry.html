@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Data Entry Ooga Chaka</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <script>
+        if (!("BarcodeDetector" in globalThis)) {
+            console.log("Barcode Detector is not supported by this browser.");
+        } else {
+            console.log("Barcode Detector supported!");
+
+            // create new detector
+            const barcodeDetector = new BarcodeDetector({
+                formats: ["code_39", "codabar", "ean_13"],
+            });
+        }
+    </script>
+</body>
+</html>
