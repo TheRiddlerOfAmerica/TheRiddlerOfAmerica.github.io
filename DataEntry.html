@@ -12,16 +12,16 @@
     <script>
         if (!("BarcodeDetector" in globalThis)) {
             console.log("Barcode Detector is not supported by this browser.");
+            document.body.style.background = "red";
         } else {
             console.log("Barcode Detector supported!");
-
+            document.body.style.background = "green";
             // create new detector
             const barcodeDetector = new BarcodeDetector({
                 formats: ["code_39", "codabar", "ean_13"],
             });
         }
     </script>
-    <input type="file" accept="image/*" capture="camera">
     <input type="file" name="image" accept="image/*" capture="environment">
 </body>
 </html>
