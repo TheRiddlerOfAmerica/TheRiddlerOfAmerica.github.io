@@ -52,6 +52,7 @@
             function onScanSuccess(decodedText, decodedResult) {
                 if (decodedText !== lastResult) {
                     ++countResults;
+                    resultContainer.innerHTML = decodedText;
                     lastResult = decodedText;
                     // Handle on success condition with the decoded message.
                     console.log(`Scan result ${decodedText}`, decodedResult);
