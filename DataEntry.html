@@ -12,17 +12,18 @@
     <script>
 
         class shelfItem {
-            constructor(desc, number, notes, posX, posY) {
+            constructor(desc, number, notes, posX, posY, lastSeen) {
                 this.desc = desc;
                 this.number = number;
                 this.notes = notes;
                 this.posX = posX;
                 this.posY = posY;
+                this.lastSeen = lastSeen;
             }
         }
 
 
-
+        /*
         if (!("BarcodeDetector" in globalThis)) {
             console.log("Barcode Detector is not supported by this browser.");
             document.body.style.background = "red";
@@ -34,6 +35,7 @@
                 formats: ["code_39", "codabar", "ean_13"],
             });
         }
+        */
 
         function docReady(fn) {
             // see if DOM is already available
@@ -60,12 +62,38 @@
             }
 
             var html5QrcodeScanner = new Html5QrcodeScanner(
-                "qr-reader", { fps: 10, qrbox: 250 });
+                "reader", { fps: 10, qrbox: 250 });
             html5QrcodeScanner.render(onScanSuccess);
         });
+
+
+        function woop() {
+            var resultContainer = document.getElementById('qr-reader-results');
+            resultContainer.innerHTML = document.getElementById('SKU').value;
+            document.body.style.background = "Azure";
+        }
     </script>
-    <input type="file" name="image" accept="image/*" capture="environment">
+    <p>Only use for code-128 bar codes <br />Example:</p>
+    <img src="https://www.computalabel.com/Images/C128.png" />
     <div id="qr-reader" style="width:500px"></div>
     <div id="qr-reader-results"></div>
+
+    <br />
+    <p>Search Input</p>
+    <label>SKU # Input</label><input id="SKU" type="text" pattern="\d*" />
+
+
+
+    <button onclick="woop()">Submit</button>
+
+    <br />
+    <br />
+    <br />
+    <p>New Item</p>
+    <label>SKU # Input</label><input id="newSKU" type="text" pattern="\d*" />
+    <label>Item Description</label><input id="newDesc" type="text"/>
+    <label>Additional Notes</label><input id="newNote" type="text"/>
+    <label>Store Position</label><input id="newSpot" type="text" pattern="\d*" />
+    <button onclick="woop()">Submit</button>
 </body>
 </html>
