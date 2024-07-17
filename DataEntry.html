@@ -2,22 +2,39 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" name="viewport" content= "width=device-width, user-scalable=no"/>
     <title>Data Entry Ooga Chaka</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
+        .blocky {
+            position: relative;
+            float: left;
+            width: 10%;
+            height: 100%;
+            text-align: center;
+            font-size: 20px;
+            line-height: 20px;
+        }
+        .fullB{
+            height:30px;
+            width:90%;
+            text-align:justify;
+
+        }
     </style>
 </head>
 <body>
     <script>
-
+        var spot = 0;
         class shelfItem {
-            constructor(desc, number, notes, posX, posY, lastSeen) {
+            constructor(desc, number, notes, spot, lastSeen) {
                 this.desc = desc;
                 this.number = number;
                 this.notes = notes;
-                this.posX = posX;
-                this.posY = posY;
+                this.spot = spot;
+                if (this.spot = 0) {
+                    this.spot = "No Place Entered... oh no ☻";
+                }
                 this.lastSeen = lastSeen;
             }
         }
@@ -62,15 +79,72 @@
             }
 
             var html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", { fps: 10, qrbox: 250 });
+                "qr-reader", { fps: 10, qrbox: 250 });
             html5QrcodeScanner.render(onScanSuccess);
         });
 
 
         function woop() {
+            //This should all be in string format...
+            var sku = document.getElementById("newSKU").innerHTML;
+            var desc = document.getElementById("newDesc").innerHTML;
+            var note = document.getElementById("newNote").innerHTML;
+            var spott = spot;
+            let currentDate = new Date();
+            var last = currentDate.toDateString();
+            //console.log(last);
+            //This is the post location for my slapped together google sheets receiver.
+            //var yourURL = https://script.google.com/macros/s/AKfycbz3SjU4j2bctSWD7CRrJdP-9iijcK4GM5Q2M4AYvKhOXmdtPZ2EfhM1zw92GpNJlhRF7w/exec
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", ' https://script.google.com/macros/s/AKfycbz3SjU4j2bctSWD7CRrJdP-9iijcK4GM5Q2M4AYvKhOXmdtPZ2EfhM1zw92GpNJlhRF7w/exec', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({
+                sku: sku,
+                desc: desc,
+                note: note,
+                spot: spott,
+                last: last
+            }));
+            //We now append to the text document.
+
             var resultContainer = document.getElementById('qr-reader-results');
-            resultContainer.innerHTML = document.getElementById('SKU').value;
-            document.body.style.background = "Azure";
+            resultContainer.innerHTML = "Item Saved";
+            document.body.style.background = "Azure";//break symbol alt+159 - ƒ
+        }
+
+        function but(me) {
+            for (let i = 1; i <= 200; i++) {
+                let d = document.getElementById("bootun" + i);
+                d.style.background = "grey";
+            }
+            document.getElementById(me).style.background = "red";
+            spot = me.substring(6);
+            console.log(spot);
+        }
+
+        function starterup() {
+            zone = document.getElementById("spotHolderIn");
+            for (let i = 0; i < 10; i++) {
+                let z = document.createElement("div");
+                z.className = "blocky";  
+                z.id = "column" + i;
+                zone.appendChild(z);
+            }
+
+            let count = 0;
+            for (let i = 0; i < 10; i++) {
+                let id = "column" + i;
+                let parent = document.getElementById(id);
+                for (let j = 0; j < 20; j++) {
+                    count++;
+                    let b = document.createElement("BUTTON");
+                    b.innerHTML = count;
+                    b.id = "bootun" + count;
+                    b.onclick = function () { but(b.id); };
+                    b.className = "fullB";
+                    parent.appendChild(b);
+                }
+            }
         }
     </script>
     <p>Only use for code-128 bar codes <br />Example:</p>
@@ -90,10 +164,13 @@
     <br />
     <br />
     <p>New Item</p>
-    <label>SKU # Input</label><input id="newSKU" type="text" pattern="\d*" />
-    <label>Item Description</label><input id="newDesc" type="text"/>
-    <label>Additional Notes</label><input id="newNote" type="text"/>
-    <label>Store Position</label><input id="newSpot" type="text" pattern="\d*" />
+    <label>SKU # Input</label><input id="newSKU" type="text" pattern="\d*" /><br />
+    <label>Item Description</label><input id="newDesc" type="text"/><br />
+    <label>Additional Notes</label><input id="newNote" type="text"/><br />
+    <label>Store Position</label><button onclick="starterup()">Start</button>
+    <div id="spotHolderIn"></div>
     <button onclick="woop()">Submit</button>
+    <br />
+    <img src="Placeholder.jpg"/>
 </body>
 </html>
