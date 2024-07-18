@@ -21,23 +21,37 @@
             text-align:justify;
 
         }
+        h1 {
+            margin: 0;
+            display: inline-block;
+        }
+
     </style>
 </head>
 <body>
     <script>
         var spot = 0;
-        class shelfItem {
-            constructor(desc, number, notes, spot, lastSeen) {
-                this.desc = desc;
-                this.number = number;
-                this.notes = notes;
-                this.spot = spot;
-                if (this.spot = 0) {
-                    this.spot = "No Place Entered... oh no ☻";
-                }
-                this.lastSeen = lastSeen;
-            }
-        }
+        var once = true;
+
+        //Database time oh no...
+        const dbName = "PJs_Products";
+        const itemStoreName = "items";
+        let db
+        const request = indexedDB.open(dbName, 1);
+        request.onerror = (event) => {
+            console.error("Why didn't you allow my web app to use IndexedDB?!");
+        };
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            console.log("database online")
+        };
+        request.onupgradeneeded = (event) => {
+            var db = event.target.result;
+            var objectStore = db.createObjectStore("items", { keyPath: "sku" });
+            objectStore.createIndex("spot", "spot", { unique: false });
+            console.log("store created successfully");
+            //document.write("Object store Created Successfully...");
+        };
 
 
         /*
@@ -52,7 +66,7 @@
                 formats: ["code_39", "codabar", "ean_13"],
             });
         }
-        */
+
 
         function docReady(fn) {
             // see if DOM is already available
@@ -82,21 +96,29 @@
                 "qr-reader", { fps: 10, qrbox: 250 });
             html5QrcodeScanner.render(onScanSuccess);
         });
+        */
 
-
-        function woop() {
+        if (!window.indexedDB) {
+            alert("Sorry! Your browser does not support IndexedDB");
+        } else {
+            console.log("oops it works")
+        }
+        function addItem() {
             //This should all be in string format...
-            var sku = document.getElementById("newSKU").innerHTML;
-            var desc = document.getElementById("newDesc").innerHTML;
-            var note = document.getElementById("newNote").innerHTML;
+            var sku = document.getElementById("newSKU").value;
+            var desc = document.getElementById("newDesc").value;
+            var note = document.getElementById("newNote").value;
             var spott = spot;
             let currentDate = new Date();
             var last = currentDate.toDateString();
+            //console.log(sku);
+            //console.log(desc);
+            //console.log(note);
             //console.log(last);
             //This is the post location for my slapped together google sheets receiver.
-            //var yourURL = https://script.google.com/macros/s/AKfycbz3SjU4j2bctSWD7CRrJdP-9iijcK4GM5Q2M4AYvKhOXmdtPZ2EfhM1zw92GpNJlhRF7w/exec
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", ' https://script.google.com/macros/s/AKfycbz3SjU4j2bctSWD7CRrJdP-9iijcK4GM5Q2M4AYvKhOXmdtPZ2EfhM1zw92GpNJlhRF7w/exec', true);
+            //var yourURL = https://script.google.com/macros/s/AKfycbzTYVL0PygadAhShwZ4O_nLpNgFH-mHxO5OogP6RFZqMUWyL8a2Hpmze4tH0nnWBeKtOA/exec
+            //var xhr = new XMLHttpRequest();
+            /*xhr.open("POST", 'https://script.google.com/macros/s/AKfycbzTYVL0PygadAhShwZ4O_nLpNgFH-mHxO5OogP6RFZqMUWyL8a2Hpmze4tH0nnWBeKtOA/exec', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify({
                 sku: sku,
@@ -105,28 +127,121 @@
                 spot: spott,
                 last: last
             }));
+            */
             //We now append to the text document.
 
-            var resultContainer = document.getElementById('qr-reader-results');
-            resultContainer.innerHTML = "Item Saved";
+            //Database time for a transaction.
+            const transaction = db.transaction(itemStoreName, 'readwrite');
+            const objectStore = transaction.objectStore(itemStoreName);
+
+            let data = {
+                sku: sku,
+                desc: desc,
+                note: note,
+                spot: spott,
+                last: last
+            }
+
+            const addRequest = objectStore.add(data);
+
+            addRequest.onsuccess = function (event) {
+                console.log("data done good job");
+            }
+            addRequest.onerror = function (event) {
+                console.error('error saving data:', event.target.error);
+            }
+            transaction.oncomplete = function (event) {
+                console.log("job done");
+                document.getElementById("result").innerHTML = "Successfully Added Item"
+                //db.close();
+            }
+
             document.body.style.background = "Azure";//break symbol alt+159 - ƒ
         }
 
-        function but(me) {
+        function recallItem() {
+            //Generates my buttons in the right spot.
+            if (once) {
+                showerup();
+                starterup();
+                once = false;
+            }
+
+            var skuNum = document.getElementById("SKU").value;
+            //Now we retrieve from the database.
+            const transaction = db.transaction(itemStoreName, 'readwrite');
+            const objectStore = transaction.objectStore(itemStoreName);
+            const request = objectStore.get(skuNum);
+            request.onerror = (event) => {
+                console.log("SKU does not exist?")
+            };
+            request.onsuccess = (event) => {
+                console.log(event.target.result);
+                document.getElementById("result").innerHTML = "Successfully Recalled Item"
+                //If the SKU does not exist it will return undefined.
+                if (event.target.result != undefined) {
+                    document.getElementById("skuInfo").style.visibility = "visible";
+                    document.getElementById("skuInfo").style.display = "block";
+                    document.getElementById("skuNew").style.visibility = "hidden";
+                    document.getElementById("skuNew").style.display = "none";
+                    
+                    //Now we fill in the information to be read, and edited.
+                    document.getElementById("infoDesc").value = event.target.result.desc;
+                    document.getElementById("infoNote").value = event.target.result.note;
+                    document.getElementById("lastSeen").innerHTML = "This item was last seen " + event.target.result.last;
+                    but("shower"+event.target.result.spot, "shower");
+                    document.getElementById("shower" + event.target.result.spot).style.background = "green";
+                } else {
+                    document.getElementById("skuNew").style.visibility = "visible";
+                    document.getElementById("skuNew").style.display = "block";
+                    document.getElementById("skuInfo").style.visibility = "hidden";
+                    document.getElementById("skuInfo").style.display = "none";
+
+                    //Gotta add the values down here as well, just make it easy for em.
+                    document.getElementById("newSKU").value = document.getElementById("SKU").value;
+                }
+            }
+
+        }
+
+        function but(me,prefix) {
             for (let i = 1; i <= 200; i++) {
-                let d = document.getElementById("bootun" + i);
+                let d = document.getElementById(prefix + i);
                 d.style.background = "grey";
             }
             document.getElementById(me).style.background = "red";
             spot = me.substring(6);
             console.log(spot);
         }
+        function showerup() {
+            zone = document.getElementById("spotHolderOut");
+            for (let i = 0; i < 10; i++) {
+                let z = document.createElement("div");
+                z.className = "blocky";
+                z.id = "columnn" + i;
+                zone.appendChild(z);
+            }
 
+            let count = 0;
+            for (let i = 0; i < 10; i++) {
+                let id = "columnn" + i;
+                let parent = document.getElementById(id);
+                for (let j = 0; j < 20; j++) {
+                    count++;
+                    let b = document.createElement("BUTTON");
+                    b.innerHTML = count;
+                    b.id = "shower" + count;
+                    b.onclick = function () { but(b.id,"shower"); };
+                    b.className = "fullB";
+                    parent.appendChild(b);
+                }
+            }
+        }
         function starterup() {
             zone = document.getElementById("spotHolderIn");
             for (let i = 0; i < 10; i++) {
                 let z = document.createElement("div");
-                z.className = "blocky";  
+                z.className = "blocky";
                 z.id = "column" + i;
                 zone.appendChild(z);
             }
@@ -140,37 +255,96 @@
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
                     b.id = "bootun" + count;
-                    b.onclick = function () { but(b.id); };
+                    b.onclick = function () { but(b.id,"bootun"); };
                     b.className = "fullB";
                     parent.appendChild(b);
                 }
             }
         }
+        var hint = true;
+        function showProcess() {
+            if (hint) {
+                document.getElementById("process1").style.visibility = "visible";
+                document.getElementById("process2").style.visibility = "visible";
+                document.getElementById("process1").style.display = "block";
+                document.getElementById("process2").style.display = "block";
+                hint = !hint;
+            } else {
+                document.getElementById("process1").style.visibility = "hidden";
+                document.getElementById("process2").style.visibility = "hidden";
+                document.getElementById("process1").style.display = "none";
+                document.getElementById("process2").style.display = "none";
+                hint = !hint;
+            }
+        }
+
+        function changeItem() {
+            var sku = document.getElementById("SKU").value;
+            var desc = document.getElementById("infoDesc").value;
+            var note = document.getElementById("infoNote").value;
+            var spott = spot;
+            let currentDate = new Date();
+            var last = currentDate.toDateString();
+
+            const transaction = db.transaction(itemStoreName, 'readwrite');
+            const objectStore = transaction.objectStore(itemStoreName);
+
+            let data = {
+                sku: sku,
+                desc: desc,
+                note: note,
+                spot: spott,
+                last: last
+            }
+
+            const requestUpdate = objectStore.put(data);
+            requestUpdate.onerror = (event) => {
+                // Do something with the error
+                console.log("could not update... whyyy???")
+            };
+            requestUpdate.onsuccess = (event) => {
+                // Success - the data is updated!
+                document.getElementById("result").innerHTML = "Successfully Updated"
+            };
+        }
     </script>
-    <p>Only use for code-128 bar codes <br />Example:</p>
-    <img src="https://www.computalabel.com/Images/C128.png" />
-    <div id="qr-reader" style="width:500px"></div>
-    <div id="qr-reader-results"></div>
 
+    <script>//From here on we start building the website now that we have save and recall down.</script>
+    <h1>Input SKU Number</h1><button onclick="showProcess()">?</button>
+    <h2 id="process1" style="visibility:hidden; display:none">Process Description:</h2>
+    <p id="process2" style="visibility:hidden; display:none">Input a SKU code, if the item already exists in the database you will be given information on the item, you can then change this information or delete it entirely. If the SKU does not exist you will be prompted to input information about the SKU number to add it to the database.</p>
     <br />
-    <p>Search Input</p>
     <label>SKU # Input</label><input id="SKU" type="text" pattern="\d*" />
+    <button onclick="recallItem()">Submit</button>
+    <br />
+    <p id="result"></p>
 
 
+    <div id="skuInfo" style="visibility:hidden; display:none">
+        <p id="lastSeen"></p>
+        <label>Item Description</label><input id="infoDesc" type="text" /><br />
+        <label>Additional Notes</label><input id="infoNote" type="text" /><br />
+        <label>Store Position</label>
+        <div id="spotHolderOut"></div>
+        <br />
+        <button onclick="changeItem()">Submit Changes</button>
+        <img style="width:100%" src="Placeholder.jpg" />
+    </div>
 
-    <button onclick="woop()">Submit</button>
+    <div id="skuNew" style="visibility:hidden; display:none">
+        <p>New Item</p>
+        <label>SKU # Input</label><input id="newSKU" type="text" pattern="\d*" /><br />
+        <label>Item Description</label><input id="newDesc" type="text" /><br />
+        <label>Additional Notes</label><input id="newNote" type="text" /><br />
+        <label>Store Position</label>
+        <div id="spotHolderIn"></div>
+        <br />
+        <button onclick="addItem()">Submit New Item</button>
+        <br />
+        <img style="width:100%" src="Placeholder.jpg" />
+    </div>
 
-    <br />
-    <br />
-    <br />
-    <p>New Item</p>
-    <label>SKU # Input</label><input id="newSKU" type="text" pattern="\d*" /><br />
-    <label>Item Description</label><input id="newDesc" type="text"/><br />
-    <label>Additional Notes</label><input id="newNote" type="text"/><br />
-    <label>Store Position</label><button onclick="starterup()">Start</button>
-    <div id="spotHolderIn"></div>
-    <button onclick="woop()">Submit</button>
-    <br />
-    <img src="Placeholder.jpg"/>
+
+    
 </body>
 </html>
