@@ -197,6 +197,10 @@
                     document.getElementById("skuInfo").style.visibility = "hidden";
                     document.getElementById("skuInfo").style.display = "none";
 
+                    //Gotta clear out the already full spots.
+                    document.getElementById("newDesc").value = "";
+                    document.getElementById("newNote").value = "";
+
                     //Gotta add the values down here as well, just make it easy for em.
                     document.getElementById("newSKU").value = document.getElementById("SKU").value;
                 }
@@ -307,10 +311,13 @@
                 document.getElementById("result").innerHTML = "Successfully Updated"
             };
         }
+
+        function makeTable() {
+
+        }
     </script>
 
-    <script>//From here on we start building the website now that we have save and recall down.</script>
-    <h1>Input SKU Number</h1><button onclick="showProcess()">?</button>
+    <h1>Input SKU Number</h1><button onclick="showProcess()">?</button><button onclick="makeTable()">Table</button>
     <h2 id="process1" style="visibility:hidden; display:none">Process Description:</h2>
     <p id="process2" style="visibility:hidden; display:none">Input a SKU code, if the item already exists in the database you will be given information on the item, you can then change this information or delete it entirely. If the SKU does not exist you will be prompted to input information about the SKU number to add it to the database.</p>
     <br />
@@ -344,7 +351,9 @@
         <img style="width:100%" src="Placeholder.jpg" />
     </div>
 
+    <div id="itemTable" style="visibility:hidden; display:none">
 
+    </div>
     
 </body>
 </html>
