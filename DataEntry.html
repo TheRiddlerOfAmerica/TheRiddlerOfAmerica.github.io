@@ -19,11 +19,14 @@
             height:30px;
             width:90%;
             text-align:justify;
-
+            border-radius: 0%;
         }
         h1 {
             margin: 0;
             display: inline-block;
+        }
+        table, th, td {
+            border: 1px solid black;
         }
 
     </style>
@@ -164,6 +167,7 @@
             if (once) {
                 showerup();
                 starterup();
+                spotup();
                 once = false;
             }
 
@@ -176,6 +180,7 @@
                 console.log("SKU does not exist?")
             };
             request.onsuccess = (event) => {
+                hideAll();
                 console.log(event.target.result);
                 document.getElementById("result").innerHTML = "Successfully Recalled Item"
                 //If the SKU does not exist it will return undefined.
@@ -265,6 +270,105 @@
                 }
             }
         }
+        function spotup() {
+            zone = document.getElementById("spotLookuper");
+            for (let i = 0; i < 10; i++) {
+                let z = document.createElement("div");
+                z.className = "blocky";
+                z.id = "columnnn" + i;
+                zone.appendChild(z);
+            }
+
+            let count = 0;
+            for (let i = 0; i < 10; i++) {
+                let id = "columnnn" + i;
+                let parent = document.getElementById(id);
+                for (let j = 0; j < 20; j++) {
+                    count++;
+                    let b = document.createElement("BUTTON");
+                    b.innerHTML = count;
+                    b.id = "spoot" + count;
+                    b.onclick = function () { lookup(b.id.substring(5)); };
+                    b.className = "fullB";
+                    parent.appendChild(b);
+                }
+            }
+        }
+        function lookup(num) {
+            hideAll();
+            document.getElementById("spotLookup").style.visibility = "visible";
+            document.getElementById("spotLookup").style.display = "block";
+            //console.log(num);
+            const transaction = db.transaction(itemStoreName, 'readwrite');
+            const objectStore = transaction.objectStore(itemStoreName);
+            const request = objectStore.getAll();
+            console.log(request);
+            request.onerror = (event) => {
+                console.log("SKU does not exist?")
+            };
+            request.onsuccess = (event) => {
+                /*
+                <tr>
+                    <th>SKU</th>
+                    <th>Area Code</th>
+                    <th>Description</th>
+                    <th>Notes</th>
+                    <th>Last Seen</th>
+                </tr>
+                */
+                let origin = document.getElementById("lilT");
+                origin.innerHTML = "";
+                let header = document.createElement("TR");
+                let z = document.createElement("TD");
+                let t = document.createTextNode("SKU");
+                z.appendChild(t);
+                header.appendChild(z);
+                let zz = document.createElement("TD");
+                let tt = document.createTextNode("Area Code");
+                zz.appendChild(tt);
+                header.appendChild(zz);
+                let zzz = document.createElement("TD");
+                let ttt = document.createTextNode("Description");
+                zzz.appendChild(ttt);
+                header.appendChild(zzz);
+                let zzzz = document.createElement("TD");
+                let tttt = document.createTextNode("Notes");
+                zzzz.appendChild(tttt);
+                header.appendChild(zzzz);
+                let zzzzz = document.createElement("TD");
+                let ttttt = document.createTextNode("Last Seen");
+                zzzzz.appendChild(ttttt);
+                header.appendChild(zzzzz);
+                origin.appendChild(header);
+                console.log(event.target.result);
+                for (let i = 0; i < event.target.result.length; i++) {
+                    if (event.target.result[i].spot == num) {
+                        let row = document.createElement("TR");
+                        let a = document.createElement("TD");
+                        let b = document.createTextNode(event.target.result[i].sku);
+                        a.appendChild(b);
+                        row.appendChild(a);
+                        let aa = document.createElement("TD");
+                        let bb = document.createTextNode(event.target.result[i].spot);
+                        aa.appendChild(bb);
+                        row.appendChild(aa);
+                        let aaa = document.createElement("TD");
+                        let bbb = document.createTextNode(event.target.result[i].desc);
+                        aaa.appendChild(bbb);
+                        row.appendChild(aaa);
+                        let aaaa = document.createElement("TD");
+                        let bbbb = document.createTextNode(event.target.result[i].note);
+                        aaaa.appendChild(bbbb);
+                        row.appendChild(aaaa);
+                        let aaaaa = document.createElement("TD");
+                        let bbbbb = document.createTextNode(event.target.result[i].last);
+                        aaaaa.appendChild(bbbbb);
+                        row.appendChild(aaaaa);
+                        origin.appendChild(row);
+                    }
+                }
+            }
+        }
         var hint = true;
         function showProcess() {
             if (hint) {
@@ -313,11 +417,117 @@
         }
 
         function makeTable() {
-
+            if (once) {
+                showerup();
+                starterup();
+                spotup();
+                once = false;
+            }
+            hideAll();
+            document.getElementById("itemTable").style.visibility = "visible";
+            document.getElementById("itemTable").style.display = "block";
+            //bigT is the table id
+            const transaction = db.transaction(itemStoreName, 'readwrite');
+            const objectStore = transaction.objectStore(itemStoreName);
+            const request = objectStore.getAll();
+            request.onerror = (event) => {
+                console.log("SKU does not exist?")
+            };
+            request.onsuccess = (event) => {
+                /*
+                <tr>
+                    <th>SKU</th>
+                    <th>Area Code</th>
+                    <th>Description</th>
+                    <th>Notes</th>
+                    <th>Last Seen</th>
+                </tr>
+                */
+                let origin = document.getElementById("bigT");
+                origin.innerHTML = "";
+                let header = document.createElement("TR");
+                let z = document.createElement("TD");
+                let t = document.createTextNode("SKU");
+                z.appendChild(t);
+                header.appendChild(z);
+                let zz = document.createElement("TD");
+                let tt = document.createTextNode("Area Code");
+                zz.appendChild(tt);
+                header.appendChild(zz);
+                let zzz = document.createElement("TD");
+                let ttt = document.createTextNode("Description");
+                zzz.appendChild(ttt);
+                header.appendChild(zzz);
+                let zzzz = document.createElement("TD");
+                let tttt = document.createTextNode("Notes");
+                zzzz.appendChild(tttt);
+                header.appendChild(zzzz);
+                let zzzzz = document.createElement("TD");
+                let ttttt = document.createTextNode("Last Seen");
+                zzzzz.appendChild(ttttt);
+                header.appendChild(zzzzz);
+                origin.appendChild(header);
+                console.log(event.target.result);
+                for (let i = 0; i < event.target.result.length; i++) {
+                    let row = document.createElement("TR");
+                    let a = document.createElement("TD");
+                    let b = document.createTextNode(event.target.result[i].sku);
+                    a.appendChild(b);
+                    row.appendChild(a);
+                    let aa = document.createElement("TD");
+                    let bb = document.createTextNode(event.target.result[i].spot);
+                    aa.appendChild(bb);
+                    row.appendChild(aa);
+                    let aaa = document.createElement("TD");
+                    let bbb = document.createTextNode(event.target.result[i].desc);
+                    aaa.appendChild(bbb);
+                    row.appendChild(aaa);
+                    let aaaa = document.createElement("TD");
+                    let bbbb = document.createTextNode(event.target.result[i].note);
+                    aaaa.appendChild(bbbb);
+                    row.appendChild(aaaa);
+                    let aaaaa = document.createElement("TD");
+                    let bbbbb = document.createTextNode(event.target.result[i].last);
+                    aaaaa.appendChild(bbbbb);
+                    row.appendChild(aaaaa);
+                    origin.appendChild(row);
+                }
+            }
         }
+
+        //He also wanted to be able to see what is in each loading area. I should probably make the loading areas
+        //smaller so that they are more comprehensive and he isn't looking through 200 spots for stuff.
+
+        function bySpot() {
+            if (once) {
+                showerup();
+                starterup();
+                spotup();
+                once = false;
+            }
+            hideAll();
+            document.getElementById("spotLookup").style.visibility = "visible";
+            document.getElementById("spotLookup").style.display = "block";
+            
+        }
+
+        function hideAll(){
+            //Hide all of the divs and such.
+            document.getElementById("skuInfo").style.visibility = "hidden";
+            document.getElementById("skuInfo").style.display = "none";
+            document.getElementById("skuNew").style.visibility = "hidden";
+            document.getElementById("skuNew").style.display = "none";
+            document.getElementById("spotLookup").style.visibility = "hidden";
+            document.getElementById("spotLookup").style.display = "none";
+            document.getElementById("itemTable").style.visibility = "hidden";
+            document.getElementById("itemTable").style.display = "none";
+        }
+        
     </script>
 
-    <h1>Input SKU Number</h1><button onclick="showProcess()">?</button><button onclick="makeTable()">Table</button>
+    <h1>Input SKU Number</h1>
+    <br />
+    <button onclick="showProcess()">?</button><button onclick="makeTable()">Table</button><button onclick="bySpot()">Area Search</button>
     <h2 id="process1" style="visibility:hidden; display:none">Process Description:</h2>
     <p id="process2" style="visibility:hidden; display:none">Input a SKU code, if the item already exists in the database you will be given information on the item, you can then change this information or delete it entirely. If the SKU does not exist you will be prompted to input information about the SKU number to add it to the database.</p>
     <br />
@@ -351,8 +561,19 @@
         <img style="width:100%" src="Placeholder.jpg" />
     </div>
 
-    <div id="itemTable" style="visibility:hidden; display:none">
+    <div id="spotLookup" style="visibility:hidden; display:none">
+        <div id="spotLookuper"></div>
+        <table id="lilT" style="width:100%">
 
+        </table>
+    </div>
+
+    <div id="itemTable" style="visibility:hidden; display:none">
+        <table id="bigT" style="width:100%">
+
+
+
+        </table>
     </div>
     
 </body>
