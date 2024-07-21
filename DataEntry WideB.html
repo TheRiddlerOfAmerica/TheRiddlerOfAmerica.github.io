@@ -9,7 +9,7 @@
         .blocky {
             position: relative;
             float: left;
-            width: 10%;
+            width: 33%;
             height: 100%;
             text-align: center;
             font-size: 20px;
@@ -227,7 +227,7 @@
         }
 
         function but(me,prefix) {
-            for (let i = 1; i <= 200; i++) {
+            for (let i = 1; i <= 30; i++) {
                 let d = document.getElementById(prefix + i);
                 d.style.background = "azure";
             }
@@ -237,7 +237,7 @@
         }
         function showerup() {
             zone = document.getElementById("spotHolderOut");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "columnn" + i;
@@ -245,10 +245,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "columnn" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
@@ -261,7 +261,7 @@
         }
         function starterup() {
             zone = document.getElementById("spotHolderIn");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "column" + i;
@@ -269,10 +269,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "column" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
@@ -285,7 +285,7 @@
         }
         function spotup() {
             zone = document.getElementById("spotLookuper");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "columnnn" + i;
@@ -293,10 +293,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "columnnn" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
