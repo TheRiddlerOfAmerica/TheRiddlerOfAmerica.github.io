@@ -9,7 +9,7 @@
         .blocky {
             position: relative;
             float: left;
-            width: 10%;
+            width: 33%;
             height: 100%;
             text-align: center;
             font-size: 20px;
@@ -22,6 +22,14 @@
             border-radius: 0%;
             color:black;
             background-color:white;
+        }
+        .headerB {
+            height: 30px;
+            width: 90%;
+            text-align: center;
+            border-radius: 0%;
+            color: black;
+            background-color: white;
         }
         .centerFrame{
             width:90%;
@@ -168,7 +176,7 @@
             }
             transaction.oncomplete = function (event) {
                 //console.log("job done");
-                document.getElementById("result").innerHTML = "Successfully Added Item"
+                document.getElementById("sButt").style.background = "green"
                 //db.close();
             }
 
@@ -183,7 +191,8 @@
                 spotup();
                 once = false;
             }
-
+            document.getElementById("sButt").style.background = "azure";
+            document.getElementById("uButt").style.background = "azure";
             var skuNum = document.getElementById("SKU").value;
             //Now we retrieve from the database.
             const transaction = db.transaction(itemStoreName, 'readwrite');
@@ -227,7 +236,7 @@
         }
 
         function but(me,prefix) {
-            for (let i = 1; i <= 200; i++) {
+            for (let i = 1; i <= 30; i++) {
                 let d = document.getElementById(prefix + i);
                 d.style.background = "azure";
             }
@@ -237,7 +246,7 @@
         }
         function showerup() {
             zone = document.getElementById("spotHolderOut");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "columnn" + i;
@@ -245,10 +254,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "columnn" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
@@ -261,7 +270,7 @@
         }
         function starterup() {
             zone = document.getElementById("spotHolderIn");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "column" + i;
@@ -269,10 +278,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "column" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
@@ -285,7 +294,7 @@
         }
         function spotup() {
             zone = document.getElementById("spotLookuper");
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let z = document.createElement("div");
                 z.className = "blocky";
                 z.id = "columnnn" + i;
@@ -293,10 +302,10 @@
             }
 
             let count = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 let id = "columnnn" + i;
                 let parent = document.getElementById(id);
-                for (let j = 0; j < 20; j++) {
+                for (let j = 0; j < 10; j++) {
                     count++;
                     let b = document.createElement("BUTTON");
                     b.innerHTML = count;
@@ -309,6 +318,14 @@
         }
         function lookup(num) {
             hideAll();
+            for (let i = 1; i <= 30; i++) {
+                let d = document.getElementById("spoot" + i);
+                d.style.background = "azure";
+            }
+            document.getElementById("spoot"+num).style.background = "green";
+            //spot = me.substring(6);
+            //spot = me.substring(6);
+            //console.log(spot);
             document.getElementById("spotLookup").style.visibility = "visible";
             document.getElementById("spotLookup").style.display = "block";
             //console.log(num);
@@ -426,6 +443,7 @@
             requestUpdate.onsuccess = (event) => {
                 // Success - the data is updated!
                 document.getElementById("result").innerHTML = "Successfully Updated"
+                document.getElementById("uButt").style.background = "green"
             };
         }
 
@@ -544,22 +562,22 @@
     </script>
     <div style="background-color:rgba(255,255,255,0.8)">
         <div style="display: flex; justify-content: center;">
-            <h1>Input SKU Number</h1>
+            <h1>BJ's Stock Storer</h1>
         </div>
         <br />
         <div style="display: flex; justify-content: center;">
-            <button onclick="showProcess()">?</button><button onclick="makeTable()" style="margin-left:30px; margin-right: 30px">Table</button><button onclick="bySpot()">Area Search</button>
+            <button class="headerB" style="margin-left:20px;" onclick="showProcess()">Process?</button><button class="headerB" onclick="makeTable()" style="margin-left:20px; margin-right: 20px">Table</button><button style="margin-right: 20px" class="headerB" onclick="bySpot()">Area Search</button>
         </div>
         <h2 id="process1" style="visibility:hidden; display:none">Process Description:</h2>
         <p id="process2" style="visibility:hidden; display:none">Input a SKU code, if the item already exists in the database you will be given information on the item, you can then change this information or delete it entirely. If the SKU does not exist you will be prompted to input information about the SKU number to add it to the database.</p>
         <br />
         <div style="display:flex; justify-content: center;">
-            <label>SKU # Input</label><input id="SKU" type="text" pattern="\d*" />
+            <label>SKU # Input-</label><input id="SKU" type="text" pattern="\d*" />
         </div>
-        
+        <br />
         <div style="display: flex; justify-content: center;">
-            <button onclick="recallItem()" style="margin-right:30px;">Submit</button>
-            <button onclick="clearr()" style="margin-left:30px;">Clear</button>
+            <button class="headerB" onclick="recallItem()" style="margin-right:20px; margin-left:20px;">Submit</button>
+            <button class="headerB" onclick="clearr()" style="margin-left:20px; margin-right:20px;">Clear</button>
         </div>
         
         <br />
@@ -580,9 +598,11 @@
                 <textarea id="infoNote" type="text" style="width:95%"></textarea><br />
             </div>
             <label>Store Position</label>
-            <div id="spotHolderOut"></div>
+            <div id="spotHolderOut" style="height: calc(30px*10);"></div>
             <br />
-            <button onclick="changeItem()">Submit Changes</button>
+            <div class="centerFrame" >
+                <button id="uButt" onclick="changeItem()" style="width:60%; margin-left:20%; font-size:20px;">Submit Changes</button>
+            </div>
             <img style="width:100%" src="Placeholder.jpg" />
         </div>
 
@@ -605,9 +625,10 @@
             </div>
 
             <label>Store Position</label>
-            <div id="spotHolderIn"></div>
-            <br />
-            <button onclick="addItem()">Submit New Item</button>
+            <div id="spotHolderIn" style="height: calc(30px*10);"></div>
+            <div class="centerFrame">
+                <button id="sButt" onclick="addItem()" style="width:60%; margin-left:20%; font-size:20px;">Submit New Item</button>
+            </div>
             <br />
             <img style="width:100%" src="Placeholder.jpg" />
         </div>
