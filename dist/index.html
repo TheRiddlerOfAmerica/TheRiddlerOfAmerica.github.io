@@ -14,12 +14,30 @@
 </div>
 	<input hidden id="in" onkeyup="check_user(this.value)" class="commune" type="text" />
 	<script>
+		var step = 0;
 		function check_user(value) {
 			value = value.toLowerCase();
-			if (value == "yes") {
-				document.getElementById("out").innerHTML = "The City You Seek";
+			if (value == "yes" && step == 0) {
+				step++
+                document.getElementById("in").value = "";
+				document.getElementById("out").innerHTML = "First came the fish";
 			}
-			if (value == "oakmont") {
+            if (value == "blackwood" && step == 1) {
+                step++
+                document.getElementById("in").value = "";
+                document.getElementById("out").innerHTML = "Second came the builders";
+			}
+            if (value == "carpenter" && step == 2) {
+                step++
+                document.getElementById("in").value = "";
+                document.getElementById("out").innerHTML = "Third came the knowledgeable";
+			}
+            if (value == "throgmorton" && step == 3) {
+                step++
+                document.getElementById("in").value = "";
+                document.getElementById("out").innerHTML = "The city you seek";
+            }
+			if (value == "oakmont" && step == 4) {
 				document.getElementById("in").value = "The Key You Need";
                 document.getElementById("out").innerHTML = "Dream";
 			}
